@@ -1,0 +1,154 @@
+---
+openapi: 3.0.0
+paths:
+  /ws/info:
+    get:
+      operationId: BackendController_getBackend
+      parameters: []
+      responses:
+        '200':
+          description: get information about this registered backend
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Backend'
+      tags:
+        - Backend Resource
+  /poi/find/all:
+    get:
+      operationId: PoiController_findAllPoi
+      parameters: []
+      responses:
+        '200':
+          description: get all points-of-interest irrespective of the specific poi type
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PoiRecord'
+      tags: &ref_0
+        - Poi Resource
+  /poi/find/{poiType}/all:
+    get:
+      operationId: PoiController_findAllPoiByType
+      parameters:
+        - name: poiType
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: get all points-of-interest for a specific poi type
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PoiRecord'
+      tags: *ref_0
+  /poi/init/preset/park:
+    post:
+      operationId: PoiController_initPresetNationalpark
+      parameters: []
+      responses:
+        '201':
+          description: preset points-of-interest for parks created
+          content:
+            application/json:
+              schema:
+                type: string
+      tags: *ref_0
+  /poi/init/custom/{poiType}:
+    post:
+      operationId: PoiController_loadCustomPoiForType
+      parameters:
+        - name: poiType
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+      responses:
+        '201':
+          description: custom points-of-interest for a specific type created
+          content:
+            application/json:
+              schema:
+                type: string
+      tags: *ref_0
+info:
+  title: POI Backend
+  description: The POI Backend API description
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: '1.0'
+servers:
+  #---------------------------------------------------------------------
+  # TODO:
+  #   Add the secure https route URL pointing to your backend service into the setting below.
+  #   You can find the route URL in RHDH by inspecting the component's details in the topology view.
+  #   If you used the suggested namespace ('demo01') and component id ('poi-backend') it should look like this https://demo01-poi-backend-demo01.<cluster_id_here>
+  #   Beware that this must be a secure HTTP URL that starts with 'https://'
+  - url: <HTTPS_ROUTE_URL_TO_YOUR_BACKEND_SERVICE_HERE>
+    description: (RHDH component deployment)
+  #---------------------------------------------------------------------
+  - url: http://localhost:3000/
+    description: (localhost testing)
+tags:
+  - name: Backend Resource
+    description: ''
+  - name: Poi Resource
+    description: ''
+components:
+  schemas:
+    Coordinates:
+      type: object
+      properties:
+        lat:
+          type: number
+        lng:
+          type: number
+      required:
+        - lat
+        - lng
+    Backend:
+      type: object
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+        zoom:
+          type: number
+      required:
+        - id
+        - displayName
+        - coordinates
+        - zoom
+    PoiRecord:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        coordinates:
+          type: array
+          items:
+            type: number
+      required:
+        - name
+        - description
+        - coordinates
